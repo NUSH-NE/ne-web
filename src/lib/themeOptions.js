@@ -18,7 +18,7 @@ export default function themeOptions(mode) {
         },
         typography: {
             fontFamily: [
-                'Poppins',
+                'Noto Sans',
                 'Roboto',
                 '-apple-system',
                 'BlinkMacSystemFont',
@@ -44,11 +44,11 @@ export default function themeOptions(mode) {
 
 /* Background of the scrollbar except button or resizer */
 ::-webkit-scrollbar-track {
-    background-color: #2c2c2c;
+    background-color: #313131;
 }
 
 ::-webkit-scrollbar-corner {
-    background-color: #2c2c2c;
+    background-color: #313131;
 }
 
 body.light ::-webkit-scrollbar-track, body.light ::-webkit-scrollbar-corner {
@@ -59,7 +59,7 @@ body.light ::-webkit-scrollbar-track, body.light ::-webkit-scrollbar-corner {
 ::-webkit-scrollbar-thumb {
     background-color: rgb(107, 107, 107);
     border-radius: 14px;
-    border: 3px solid #2c2c2c;
+    border: 3px solid #313131;
     transition: all 500ms ease-out;
 }
 ::-webkit-scrollbar-thumb:hover {
