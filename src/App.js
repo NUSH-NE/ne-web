@@ -4,6 +4,7 @@ import {
     Paper,
     Typography,
     Box,
+    Chip,
     IconButton,
     Tooltip,
     Divider,
@@ -16,9 +17,13 @@ import {
 } from '@material-ui/core';
 import { useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { makeStyles, createStyles } from '@material-ui/styles';
 
 // Framer Motion
 import { motion } from 'framer-motion';
+
+// Virtuoso
+import { Virtuoso } from 'react-virtuoso';
 
 // Icons
 import DescriptionRoundedIcon from '@material-ui/icons/DescriptionRounded';
@@ -27,11 +32,20 @@ import PhotoRoundedIcon from '@material-ui/icons/PhotoRounded';
 import ExpandMoreRoundedIcon from '@material-ui/icons/ExpandMoreRounded';
 import ThumbUpRoundedIcon from '@material-ui/icons/ThumbUpRounded';
 import ThumbDownRoundedIcon from '@material-ui/icons/ThumbDownRounded';
-import SubjectRoundedIcon from '@material-ui/icons/SubjectRounded';
 
 import mainBg from './assets/img/mainBg.webp';
 import SortableSectionHeader from './fragments/SortableSectionHeader';
-import { useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import ArticleCard from './fragments/ArticleCard';
+import SortButtonDropdown from './fragments/SortButtonDropdown';
+
+// Firebase
+import firebase from 'firebase/app';
+
+// Images
+import endReached from './assets/endReached.webp';
+
+let db, storageRef;
 
 const photoCardData = [
     { imgURL:
@@ -55,19 +69,132 @@ const photoCardData = [
         desc: 'Lol i think this room looks nice because...',
         likes: -20
     },
-]
+];
+
+const useStyles = makeStyles((theme) => createStyles({
+    heroBg: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: -1,
+        backgroundImage: `url('${mainBg}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        animation: '$entry 1.5s ease-in-out 1.5s forwards',
+        transform: 'scale(1.25)',
+        filter: 'blur(8px) brightness(0)',
+    },
+    '@keyframes entry': {
+        '60%': {
+            filter: 'blur(6px) brightness(1)',
+        },
+        'to': {
+            transform: 'scale(1)',
+            filter: 'blur(0)',
+        }
+    }
+}));
+
+const generatePlaceholderArticles = (num) => {
+    const a = [];
+    for (let i = 0; i < num; i++) {
+        a.push({
+            imgURL: `https://picsum.photos/seed/${Math.floor(Math.random() * 1000)}/720/405.webp?s=${Math.floor(Math.random() * 1000)}`,
+            title: i % 2 === 0 ? 'The articles go on forever!' : 'Go on ;D',
+            summary: i % 2 === 0 ? 'You can literally scroll forever and you\'d never reach the end' : 'Keep scrolling down...',
+            rating: Math.floor(Math.random() * 100) - 50
+        });
+    }
+    return a;
+}
+
+const getMoreArticles = async (n, l) => {
+    const snap = await db.collection('articles').orderBy('time').startAfter(l).limit(n).get();
+    const t = [];
+    for (const doc of snap.docs) {
+        const d = doc.data();
+        const img = d.coverURL?.match(/\.com\/.\/(?<f>.*)(\?)/)[1];
+        let imgURL;
+        try {
+            imgURL = img ? await storageRef.child(decodeURIComponent(img)).getDownloadURL() : null
+        } catch(e) {
+            imgURL = null
+        }
+        t.push({
+            title: d.title ?? 'No article title',
+            summary: d.sum ?? 'No article summary',
+            rating: 0,
+            imgURL: imgURL,
+            time: d.time,
+        });
+    }
+    return t;
+}
 
 export default function App() {
-    const theme = useTheme();
-    const desktop = useMediaQuery(theme.breakpoints.up('sm'));
-    const smallBtn = useMediaQuery('(max-width:380px)');
-    const btnSize = smallBtn ? 'small' : (desktop ? 'large' : 'medium')
+    const classes = useStyles();
 
-    const heroRef = useRef(null);
+    const theme = useTheme();
+    const desktop = useMediaQuery(theme.breakpoints.up('sm')),
+        smallBtn = useMediaQuery('(max-width:380px)'),
+        articleSmallLayout = useMediaQuery('(max-width:800px)');
+    const btnSize = smallBtn ? 'small' : (desktop ? 'large' : 'medium');
+
+    const heroRef = useRef(null),
+        pictureCarousel = useRef(null),
+        [articles, setArticles] = useState(() => []),
+        [allLoaded, setAllLoaded] = useState(false),
+        [websites, setWebsites] = useState([]);
+
+    useEffect(() => {
+        db = firebase.firestore();
+        storageRef = firebase.storage().ref();
+
+        const pc = pictureCarousel.current;
+
+        const wheelHandler = e => {
+            if (pc.scrollWidth - pc.clientWidth <= pc.scrollLeft + e.deltaY || pc.scrollLeft + e.deltaY <= 0) return;
+            pc.scrollBy(e.deltaY, 0);
+            e.preventDefault();
+        }
+
+        db.collection('configurableElements').doc('links').onSnapshot(snap => {
+            setWebsites([]);
+            for (const label in snap.data()) {
+                setWebsites(v => [...v, {label, href: snap.data()[label]}])
+            }
+        })
+
+        pc.addEventListener('wheel', wheelHandler);
+
+        return () => {
+            pc.removeEventListener('wheel', wheelHandler)
+        }
+    }, []);
+
+    // Helper functions (in a function)
+    const loadMoreArticles = useCallback(() => {
+        let o = true;
+        setArticles(v => {
+            if (!o) return v;
+            o = false;
+            getMoreArticles(5, v[v.length - 1]?.time ?? 0).then(articles => {
+                if (articles.length === 0) setAllLoaded(true);
+                else setArticles(v => ([...v, ...articles]));
+            });
+            return v;
+        });
+    }, []);
+
+    // Load initial articles
+    useEffect(() => {
+        loadMoreArticles();
+    }, [loadMoreArticles])
 
     return <>
-        <Box minHeight='100vh' sx={{position: 'fixed', top: 0, left: 0, right: 0, zIndex: -1,
-            backgroundImage: `url('${mainBg}')`, backgroundSize: 'cover', backgroundPosition: 'center'}} />
+        <Box minHeight={desktop ? 'calc(100vh - 125px)' : 'calc(12vh + 125px)'} className={classes.heroBg} />
+
         <Box minHeight='100vh'>
             {
                 !desktop && <Typography variant='h2' pt='12vh' gutterBottom
@@ -84,8 +211,8 @@ export default function App() {
                                 transition={{
                                     type: 'spring',
                                     mass: .5,
-                                    stiffness: 200,
-                                    damping: 5,
+                                    stiffness: 300,
+                                    damping: 10,
                                 }}>
                         <Typography variant='h2' px={2} py={1.5} fontFamily='Poppins, Noto Sans'
                                     sx={{backdropFilter: 'blur(8px)'}}>NE Things</Typography>
@@ -109,19 +236,30 @@ export default function App() {
 
                 <Typography align='center' variant='body1' py={1}>...or continue exploring below</Typography>
                 {
-                    desktop && <IconButton sx={{left: '50%', transform: 'translateX(-50%)', mb: 1}}
-                                           href='#sHash'><ExpandMoreRoundedIcon /></IconButton>
+                    desktop && <IconButton sx={{left: '50%', transform: 'translateX(-50%)', mb: 1, p: 0}}
+                                           href='#sHash'>
+                        <motion.span whileHover={{y: [null, 5, 0]}}
+                                     transition={{duration: .4}} style={{display: 'flex', padding: 12}}>
+                            <ExpandMoreRoundedIcon />
+                        </motion.span>
+                    </IconButton>
                 }
 
                 <SortableSectionHeader header='Photos' mb={1} id='sHash'/>
                 {
-                    !desktop && <Typography variant='subtitle2' color='text.secondary' mb={1}>Top images posted this week</Typography>
+                    !desktop && <Typography variant='subtitle2' color='text.secondary' mb={1}>Top 3 images posted this week</Typography>
                 }
-                <Box display='grid' gridTemplateColumns='repeat(auto-fill, minMax(280px, 1fr))' gap={1}>
+                <Box display='flex' flexWrap='nowrap' gap={1} ref={pictureCarousel}
+                     sx={{overflowX: 'auto', '&::-webkit-scrollbar': {height: 13},
+                         '&:hover::-webkit-scrollbar-thumb': {backgroundColor: '#6B6B6BFF'},
+                         '&::-webkit-scrollbar-thumb': {backgroundColor: '#313131'},
+                     }}
+                >
                     {
-                        photoCardData.map(d => <Card key={d.title}>
+                        photoCardData.map(d => <Card key={d.title} sx={{minWidth: 320}}>
                             <CardActionArea>
                                 <CardMedia
+                                    sx={{ aspectRatio: '16/9'}}
                                     image={d.imgURL}
                                     title={d.title}
                                 />
@@ -136,13 +274,23 @@ export default function App() {
                                     View
                                 </Button>
                                 <Box flexGrow={1} />
-                                <IconButton sx={{p: .8}}><ThumbUpRoundedIcon fontSize='small' /></IconButton>
-                                <IconButton sx={{p: .8}}><ThumbDownRoundedIcon fontSize='small' /></IconButton>
+                                <IconButton sx={{p: 0}}>
+                                    <motion.span whileHover={{rotate: [null, -16, 0]}}
+                                                 transition={{duration: .4}} style={{display: 'flex', padding: 6.4}}>
+                                        <ThumbUpRoundedIcon fontSize='small' />
+                                    </motion.span>
+                                </IconButton>
+                                <IconButton sx={{p: 0}}>
+                                    <motion.span whileHover={{rotate: [null, 16, 0]}}
+                                                 transition={{duration: .4}} style={{display: 'flex', padding: 6.4}}>
+                                        <ThumbDownRoundedIcon fontSize='small' />
+                                    </motion.span>
+                                </IconButton>
                             </CardActions>
                         </Card>)
                     }
                     {
-                        desktop && <Card sx={{display: 'flex'}}>
+                        desktop && <Card sx={{display: 'flex', minWidth: 220}}>
                             <CardActionArea>
                                 <CardContent>
                                     <Typography gutterBottom variant='h4' color='text.secondary' component='div' align='center'>
@@ -164,14 +312,67 @@ export default function App() {
 
                 <Divider sx={{my: 1.8, mt: desktop ? 1.8 : 0}}/>
 
-                <Typography variant='h6'>Articles</Typography>
-
+                <SortableSectionHeader header='Articles' mb={1} />
                 {
-                    !desktop && <Button sx={{my: 1.8, width: '100%'}} variant='contained'
-                                        startIcon={<SubjectRoundedIcon />}>Read More</Button>
+                    !desktop && <Typography variant='subtitle2' color='text.secondary' mb={1}>Top 3 images posted this week</Typography>
                 }
 
-                <Paper elevation={20} sx={{borderRadius: '36px 36px 0 0', p: '18px 18px 16px', m: '0 -18px', mt: 1}}>
+                <Box display='flex' justifyContent='center' alignItems='flex-start'
+                     flexDirection={articleSmallLayout ? 'column-reverse' : 'row'}>
+                    <Virtuoso
+                        style={{width: articleSmallLayout ? '100%' : 640}}
+                        useWindowScroll
+                        data={articles}
+                        endReached={loadMoreArticles}
+                        overscan={1000}
+                        itemContent={(i, article) => <ArticleCard {...article} />}
+                        components={{
+                            Footer: () => <>
+                                {
+                                    !allLoaded && <ArticleCard />
+                                }
+                                {
+                                    allLoaded && <div>
+                                        <Typography align='center' variant='h5' color='text.secondary' mt={1}>
+                                            Looks like you've reached the end!
+                                        </Typography>
+                                        <motion.img src={endReached} whileHover={{y: [8, -8]}} style={{padding: '.5rem', width: '100%'}}
+                                                    transition={{duration: 4, repeat: Infinity, repeatType: 'reverse'}} draggable={false} />
+                                    </div>
+                                }
+                            </>
+                        }}
+                    />
+
+                    <Card sx={{width: articleSmallLayout ? '100%' : 312, ml: articleSmallLayout ? 0 : 3,
+                        mb: 1.5, position: articleSmallLayout ? 'relative' : 'sticky', top: articleSmallLayout ? 0 : 24}}>
+                        <CardContent sx={{pb: '1rem!important'}}>
+                            <Typography variant='h6' lineHeight={1}>Articles</Typography>
+                            <Divider sx={{py: .25}}>About</Divider>
+                            <Typography variant='subtitle2' color='text.secondary'>
+                                These are articles hand-crafted by the lovely teachers and students in the NE community
+                            </Typography>
+                            {
+                                !articleSmallLayout && <>
+                                    <Divider sx={{py: .25}}>Sort & Filter</Divider>
+                                    <SortButtonDropdown fullWidth sx={{my: .5}} />
+                                </>
+                            }
+                            <Divider sx={{py: .25}}>Related Websites</Divider>
+                            <Box display='flex' gap={1} flexWrap='wrap' my={.5}>
+                                {
+                                    websites.map(s => <Chip key={s.href} {...s} clickable component='a' target='_blank' />)
+                                }
+                            </Box>
+                            <Divider sx={{py: .25}}>Credits</Divider>
+                            <Typography variant='subtitle2' color='text.secondary'>
+                                Another quality product by Vincent Kwok and Wang Zerui in collaboration with the NUSH NE community
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Box>
+
+                <Paper elevation={20} sx={{borderRadius: '36px 36px 0 0', p: '18px 18px 16px', m: '0 -18px'}}>
                     <Typography variant='h4'>NUSH NE Stuff</Typography>
                     <Typography variant='body1' color='text.secondary'>
                         Another quality product by Vincent Kwok and Wang Zerui in collaboration with the NUSH NE community

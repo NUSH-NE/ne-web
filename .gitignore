@@ -3,8 +3,13 @@
 # dependencies
 /node_modules
 /.pnp
-.yarn/build-state.yml
-.yarn/unplugged
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
 # testing
 /coverage

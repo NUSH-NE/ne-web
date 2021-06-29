@@ -13,7 +13,7 @@ export default function themeOptions(mode) {
                 main: '#1976d2',
             },
             secondary: {
-                main: '#9c27b0',
+                main: '#fbc02d',
             },
         },
         typography: {
@@ -51,27 +51,16 @@ export default function themeOptions(mode) {
     background-color: #313131;
 }
 
-body.light ::-webkit-scrollbar-track, body.light ::-webkit-scrollbar-corner {
-    background-color: rgb(223, 223, 223);
-}
-
 /* scrollbar itself */
 ::-webkit-scrollbar-thumb {
-    background-color: rgb(107, 107, 107);
+    background-color: #6B6B6B;
     border-radius: 14px;
     border: 3px solid #313131;
     transition: all 500ms ease-out;
+    min-height: 50px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(149, 149, 149);
-}
-
-.light *::-webkit-scrollbar-thumb {
-    background-color: rgb(150, 150, 150) !important;
-    border: 3px solid rgb(223, 223, 223) !important;
-}
-.light *::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(101, 101, 101) !important;
+    background-color: rgb(149, 149, 149)!important;
 }
 /* ============ */` : ''),
             },

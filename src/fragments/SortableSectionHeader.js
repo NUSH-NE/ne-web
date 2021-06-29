@@ -1,13 +1,13 @@
-import { Typography, Box, Button } from '@material-ui/core';
+import { Typography, Box } from '@material-ui/core';
+import { memo } from 'react';
 
-// Icons
-import ExpandMoreRoundedIcon from '@material-ui/icons/ExpandMoreRounded';
+import SortButtonDropdown from './SortButtonDropdown';
 
-export default function SortableSectionHeader(p) {
+export default memo(function SortableSectionHeader(p) {
     const {header, ...others} = p;
     return <Box display='flex' {...others}>
         <Typography variant='h6'>{header}</Typography>
         <Box flexGrow={1} />
-        <Button endIcon={<ExpandMoreRoundedIcon />} variant='outlined'>Sort</Button>
+        <SortButtonDropdown />
     </Box>
-}
+})
