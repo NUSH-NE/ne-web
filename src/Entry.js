@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom';
 import App from './App';
 import themeOptions from './lib/themeOptions';
-import { Typography, Alert, IconButton, Collapse, CssBaseline, ThemeProvider, Fab } from '@material-ui/core';
+import { Typography, Alert, IconButton, Collapse, CssBaseline, ThemeProvider } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 // Import firebase stuff
@@ -21,7 +21,6 @@ import 'firebase/app-check';
 // Icons
 import CloseRoundedIcon from '@material-ui/icons/CloseRounded';
 import AnnouncementRoundedIcon from '@material-ui/icons/AnnouncementRounded';
-import LoginRoundedIcon from '@material-ui/icons/LoginRounded';
 
 // Fonts
 import '@fontsource/noto-sans/400.css';
@@ -55,10 +54,6 @@ export default function Entry() {
 
     return <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Fab variant='extended' color='secondary' sx={{top: 8, right: 8, position: 'absolute', zIndex: 2}}>
-            Login
-            <LoginRoundedIcon sx={{ ml: 1 }} />
-        </Fab>
         <Collapse in={alertOpen} mountOnEnter unmountOnExit orientation='horizontal' style={{ position: 'fixed', zIndex: 6, ...alertStyles}}>
             <div>
                 <Alert variant='filled' sx={{backgroundColor: '#2e7d3288', border: '1px solid #ffffff45',

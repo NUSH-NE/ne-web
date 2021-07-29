@@ -13,7 +13,8 @@ import {
     CardActions,
     CardMedia,
     CardActionArea,
-    CircularProgress
+    CircularProgress,
+    Fab,
 } from '@material-ui/core';
 import { useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -32,6 +33,8 @@ import PhotoRoundedIcon from '@material-ui/icons/PhotoRounded';
 import ExpandMoreRoundedIcon from '@material-ui/icons/ExpandMoreRounded';
 import ThumbUpRoundedIcon from '@material-ui/icons/ThumbUpRounded';
 import ThumbDownRoundedIcon from '@material-ui/icons/ThumbDownRounded';
+import LoginRoundedIcon from '@material-ui/icons/LoginRounded';
+import PersonRoundedIcon from '@material-ui/icons/PersonRounded';
 
 import mainBg from './assets/img/mainBg.webp';
 import SortableSectionHeader from './fragments/SortableSectionHeader';
@@ -44,8 +47,10 @@ import firebase from 'firebase/app';
 
 // Images
 import endReached from './assets/endReached.webp';
+import UserAccount from './components/UserAccount';
+import UploadImgBtn from './fragments/UploadImgBtn';
 
-let db, storageRef;
+let db, storageRef, auth;
 
 const photoCardData = [
     { imgURL:
@@ -96,21 +101,8 @@ const useStyles = makeStyles((theme) => createStyles({
     }
 }));
 
-const generatePlaceholderArticles = (num) => {
-    const a = [];
-    for (let i = 0; i < num; i++) {
-        a.push({
-            imgURL: `https://picsum.photos/seed/${Math.floor(Math.random() * 1000)}/720/405.webp?s=${Math.floor(Math.random() * 1000)}`,
-            title: i % 2 === 0 ? 'The articles go on forever!' : 'Go on ;D',
-            summary: i % 2 === 0 ? 'You can literally scroll forever and you\'d never reach the end' : 'Keep scrolling down...',
-            rating: Math.floor(Math.random() * 100) - 50
-        });
-    }
-    return a;
-}
-
 const getMoreArticles = async (n, l) => {
-    const snap = await db.collection('articles').orderBy('time').startAfter(l).limit(n).get();
+    const snap = await db.collection('articles').orderBy('time', 'desc').startAfter(l).limit(n).get();
     const t = [];
     for (const doc of snap.docs) {
         const d = doc.data();
@@ -145,11 +137,15 @@ export default function App() {
         pictureCarousel = useRef(null),
         [articles, setArticles] = useState(() => []),
         [allLoaded, setAllLoaded] = useState(false),
-        [websites, setWebsites] = useState([]);
+        [websites, setWebsites] = useState([]),
+        [acctOpen, setAcctOpen] = useState(false),
+        [user, setUser] = useState(null);
 
     useEffect(() => {
         db = firebase.firestore();
         storageRef = firebase.storage().ref();
+        auth = firebase.auth();
+        auth.onAuthStateChanged(u => setUser(u));
 
         const pc = pictureCarousel.current;
 
@@ -179,7 +175,7 @@ export default function App() {
         setArticles(v => {
             if (!o) return v;
             o = false;
-            getMoreArticles(5, v[v.length - 1]?.time ?? 0).then(articles => {
+            getMoreArticles(5, v[v.length - 1]?.time ?? +new Date()).then(articles => {
                 if (articles.length === 0) setAllLoaded(true);
                 else setArticles(v => ([...v, ...articles]));
             });
@@ -193,6 +189,12 @@ export default function App() {
     }, [loadMoreArticles])
 
     return <>
+        <Fab variant='extended' color='secondary' onClick={() => setAcctOpen(true)}
+             sx={{top: 8, right: 8, position: 'absolute', zIndex: 2}}>
+            {user ? 'Account' : 'Login'}
+            {user ? <PersonRoundedIcon sx={{ ml: 1 }} /> : <LoginRoundedIcon sx={{ ml: 1 }} />}
+        </Fab>
+
         <Box minHeight={desktop ? 'calc(100vh - 125px)' : 'calc(12vh + 125px)'} className={classes.heroBg} />
 
         <Box minHeight='100vh'>
@@ -380,5 +382,9 @@ export default function App() {
                 </Paper>
             </Paper>
         </Box>
+
+        <UserAccount open={acctOpen} setOpen={setAcctOpen} appName='NUSH NE'/>
+
+        <UploadImgBtn />
     </>
 }
