@@ -6,15 +6,12 @@ import {
     Box,
     Chip,
     IconButton,
-    Tooltip,
     Divider,
     Card,
     CardContent,
-    CardActions,
-    CardMedia,
-    CardActionArea,
-    CircularProgress,
     Fab,
+    Collapse,
+    Alert
 } from '@material-ui/core';
 import { useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -31,10 +28,9 @@ import DescriptionRoundedIcon from '@material-ui/icons/DescriptionRounded';
 import GamesRoundedIcon from '@material-ui/icons/GamesRounded';
 import PhotoRoundedIcon from '@material-ui/icons/PhotoRounded';
 import ExpandMoreRoundedIcon from '@material-ui/icons/ExpandMoreRounded';
-import ThumbUpRoundedIcon from '@material-ui/icons/ThumbUpRounded';
-import ThumbDownRoundedIcon from '@material-ui/icons/ThumbDownRounded';
-import LoginRoundedIcon from '@material-ui/icons/LoginRounded';
-import PersonRoundedIcon from '@material-ui/icons/PersonRounded';
+import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
+import CloseRoundedIcon from '@material-ui/icons/CloseRounded';
+import AnnouncementRoundedIcon from '@material-ui/icons/AnnouncementRounded';
 
 import mainBg from './assets/img/mainBg.webp';
 import SortableSectionHeader from './fragments/SortableSectionHeader';
@@ -46,35 +42,15 @@ import SortButtonDropdown from './fragments/SortButtonDropdown';
 import firebase from 'firebase/app';
 
 // Images
-import endReached from './assets/endReached.webp';
 import UserAccount from './components/UserAccount';
 import UploadImgBtn from './fragments/UploadImgBtn';
+import EndIsland from './fragments/EndIsland';
+import PhotoCard from './fragments/PhotoCard';
+import ArticleViewer from './components/ArticleViewer';
+import PhotoPostViewer from './components/PhotoPostViewer';
+import SideDrawer from './components/SideDrawer';
 
 let db, storageRef, auth;
-
-const photoCardData = [
-    { imgURL:
-      'https://images.unsplash.com/photo-1623912804974-04739c6fee93?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=720&ixlib=rb-1.2.1&q=80&w=1080',
-        title: 'This image looks nice right',
-        user: 'Chenghoa Dong',
-        desc: 'Lol i think this room looks nice because...',
-        likes: -10
-    },
-    { imgURL:
-      'https://images.unsplash.com/photo-1622559026787-732cf95eaaab?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=720&ixlib=rb-1.2.1&q=80&w=1080',
-        title: 'Another Image',
-        user: 'Chenghoa Dong',
-        desc: 'Lol i think this room looks nice because...',
-        likes: -15
-    },
-    { imgURL:
-      'https://images.unsplash.com/photo-1622588895463-918c77b4ce4f?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=720&ixlib=rb-1.2.1&q=80&w=1080',
-        title: 'A third image',
-        user: 'Chenghoa Dong',
-        desc: 'Lol i think this room looks nice because...',
-        likes: -20
-    },
-];
 
 const useStyles = makeStyles((theme) => createStyles({
     heroBg: {
@@ -116,9 +92,12 @@ const getMoreArticles = async (n, l) => {
         t.push({
             title: d.title ?? 'No article title',
             summary: d.sum ?? 'No article summary',
+            body: d.body,
+            hideVote: d.hideVote,
             rating: 0,
             imgURL: imgURL,
             time: d.time,
+            uid: d.uid,
         });
     }
     return t;
@@ -139,7 +118,16 @@ export default function App() {
         [allLoaded, setAllLoaded] = useState(false),
         [websites, setWebsites] = useState([]),
         [acctOpen, setAcctOpen] = useState(false),
-        [user, setUser] = useState(null);
+        [user, setUser] = useState(null),
+        [photoCardData, setPhotoCardData] = useState([]),
+        [article, setArticle] = useState({}),
+        [artOpen, setArtOpen] = useState(false),
+        [prevPhoto, setPrevPhoto] = useState({src: '', caption: '', title: ''}),
+        [photoPrevOpen, setPhotoPrevOpen] = useState(false),
+        [drawerOpen, setDrawerOpen] = useState(false);
+
+    const [alertOpen, setAlertOpen] = useState(true);
+    const alertStyles = desktop ? {right: 16, top: 16} : {left: 10, top: 10};
 
     useEffect(() => {
         db = firebase.firestore();
@@ -186,13 +174,55 @@ export default function App() {
     // Load initial articles
     useEffect(() => {
         loadMoreArticles();
-    }, [loadMoreArticles])
+    }, [loadMoreArticles]);
+
+    // Load photos
+    useEffect(() => {
+        const t = [];
+        storageRef.child('userPostImages').listAll().then(res => {
+            console.log(res)
+            res.items.forEach(async r => {
+                const meta = await r.getMetadata();
+                const url = await r.getDownloadURL();
+
+                t.push({
+                    imgURL: url,
+                    title: meta.customMetadata.title,
+                    desc: meta.customMetadata.caption,
+                    likes: Math.floor(Math.random() * 20) - 10
+                });
+            });
+        });
+        setPhotoCardData(t);
+    }, []);
 
     return <>
-        <Fab variant='extended' color='secondary' onClick={() => setAcctOpen(true)}
-             sx={{top: 8, right: 8, position: 'absolute', zIndex: 2}}>
-            {user ? 'Account' : 'Login'}
-            {user ? <PersonRoundedIcon sx={{ ml: 1 }} /> : <LoginRoundedIcon sx={{ ml: 1 }} />}
+        <Collapse in={alertOpen} mountOnEnter unmountOnExit orientation='horizontal' style={{ position: 'fixed', zIndex: 6, ...alertStyles}}>
+            <div>
+                <Alert variant='filled' sx={{backgroundColor: '#2e7d3288', border: '1px solid #ffffff45',
+                    width: desktop ? 300 : 'calc(100vw - 20px)', backdropFilter: 'blur(6px) saturate(1.5)',
+                    'div.MuiAlert-action': {alignItems: 'center', pt: 0}}}
+                       icon={<AnnouncementRoundedIcon />}
+                       action={
+                           <IconButton
+                               aria-label='close'
+                               color='inherit'
+                               size='small'
+                               onClick={() => {
+                                   setAlertOpen(false);
+                               }}
+                           >
+                               <CloseRoundedIcon fontSize='inherit' />
+                           </IconButton>
+                       }>
+                    <Typography>This is an announcement</Typography>
+                </Alert>
+            </div>
+        </Collapse>
+
+        <Fab color='primary' onClick={() => setDrawerOpen(true)}
+             sx={{top: 8, right: 8, position: 'fixed', zIndex: 2}}>
+            <MenuRoundedIcon />
         </Fab>
 
         <Box minHeight={desktop ? 'calc(100vh - 125px)' : 'calc(12vh + 125px)'} className={classes.heroBg} />
@@ -228,18 +258,17 @@ export default function App() {
                     <Typography variant='h6'>Try one of these quick actions below!</Typography>
                     <Box display='flex'>
                         <Button size={btnSize} variant='contained' sx={{mr: .25}}
-                                startIcon={<DescriptionRoundedIcon />}>Crappy news</Button>
+                                startIcon={<DescriptionRoundedIcon />}>Latest news</Button>
                         <Button size={btnSize} variant='contained' sx={{mx: .25}}
-                                startIcon={<GamesRoundedIcon />}>Boring Games</Button>
-                        <Button size={btnSize} variant='contained' sx={{ml: .25}}
-                                startIcon={<PhotoRoundedIcon />}>Nasty Photos</Button>
+                                startIcon={<GamesRoundedIcon />}>Games</Button>
+                        <Button size={btnSize} variant='contained' sx={{ml: .25}} href='#sHash'
+                                startIcon={<PhotoRoundedIcon />}>Image posts</Button>
                     </Box>
                 </Box>
 
                 <Typography align='center' variant='body1' py={1}>...or continue exploring below</Typography>
                 {
-                    desktop && <IconButton sx={{left: '50%', transform: 'translateX(-50%)', mb: 1, p: 0}}
-                                           href='#sHash'>
+                    desktop && <IconButton sx={{left: '50%', transform: 'translateX(-50%)', mb: 1, p: 0}} href='#sHash'>
                         <motion.span whileHover={{y: [null, 5, 0]}}
                                      transition={{duration: .4}} style={{display: 'flex', padding: 12}}>
                             <ExpandMoreRoundedIcon />
@@ -255,55 +284,10 @@ export default function App() {
                      sx={{overflowX: 'auto', '&::-webkit-scrollbar': {height: 13},
                          '&:hover::-webkit-scrollbar-thumb': {backgroundColor: '#6B6B6BFF'},
                          '&::-webkit-scrollbar-thumb': {backgroundColor: '#313131'},
-                     }}
-                >
+                     }}>
                     {
-                        photoCardData.map(d => <Card key={d.title} sx={{minWidth: 320}}>
-                            <CardActionArea>
-                                <CardMedia
-                                    sx={{ aspectRatio: '16/9'}}
-                                    image={d.imgURL}
-                                    title={d.title}
-                                />
-                                <CardContent>
-                                    <Typography gutterBottom variant='h6' component='div'>{d.title}</Typography>
-                                    <Typography variant='body2' color='text.secondary' gutterBottom>by {d.user} ({d.likes} Likes)</Typography>
-                                    <Typography variant='body2' color='text.secondary'>{d.desc}</Typography>
-                                </CardContent>
-                            </CardActionArea>
-                            <CardActions>
-                                <Button size='small'>
-                                    View
-                                </Button>
-                                <Box flexGrow={1} />
-                                <IconButton sx={{p: 0}}>
-                                    <motion.span whileHover={{rotate: [null, -16, 0]}}
-                                                 transition={{duration: .4}} style={{display: 'flex', padding: 6.4}}>
-                                        <ThumbUpRoundedIcon fontSize='small' />
-                                    </motion.span>
-                                </IconButton>
-                                <IconButton sx={{p: 0}}>
-                                    <motion.span whileHover={{rotate: [null, 16, 0]}}
-                                                 transition={{duration: .4}} style={{display: 'flex', padding: 6.4}}>
-                                        <ThumbDownRoundedIcon fontSize='small' />
-                                    </motion.span>
-                                </IconButton>
-                            </CardActions>
-                        </Card>)
-                    }
-                    {
-                        desktop && <Card sx={{display: 'flex', minWidth: 220}}>
-                            <CardActionArea>
-                                <CardContent>
-                                    <Typography gutterBottom variant='h4' color='text.secondary' component='div' align='center'>
-                                        Click to load more
-                                    </Typography>
-                                    <Tooltip title='Loading more posts...'>
-                                        <CircularProgress sx={{display: 'block', mx: 'auto'}} />
-                                    </Tooltip>
-                                </CardContent>
-                            </CardActionArea>
-                        </Card>
+                        photoCardData.map(d => <PhotoCard d={d} key={d.title + d.desc + d.user}
+                                                          preview={setPrevPhoto} previewOpen={setPhotoPrevOpen} />)
                     }
                 </Box>
 
@@ -327,21 +311,11 @@ export default function App() {
                         data={articles}
                         endReached={loadMoreArticles}
                         overscan={1000}
-                        itemContent={(i, article) => <ArticleCard {...article} />}
+                        itemContent={(i, article) => <ArticleCard {...article} setArticle={setArticle} setOpen={setArtOpen} />}
                         components={{
                             Footer: () => <>
-                                {
-                                    !allLoaded && <ArticleCard />
-                                }
-                                {
-                                    allLoaded && <div>
-                                        <Typography align='center' variant='h5' color='text.secondary' mt={1}>
-                                            Looks like you've reached the end!
-                                        </Typography>
-                                        <motion.img src={endReached} whileHover={{y: [8, -8]}} style={{padding: '.5rem', width: '100%'}}
-                                                    transition={{duration: 4, repeat: Infinity, repeatType: 'reverse'}} draggable={false} />
-                                    </div>
-                                }
+                                { !allLoaded && <ArticleCard /> }
+                                { allLoaded && <EndIsland /> }
                             </>
                         }}
                     />
@@ -386,5 +360,11 @@ export default function App() {
         <UserAccount open={acctOpen} setOpen={setAcctOpen} appName='NUSH NE'/>
 
         <UploadImgBtn />
+
+        <ArticleViewer article={article} open={artOpen} setOpen={setArtOpen} />
+
+        <PhotoPostViewer open={photoPrevOpen} setOpen={setPhotoPrevOpen} {...prevPhoto} />
+
+        <SideDrawer open={drawerOpen} setOpen={setDrawerOpen} setAcctOpen={setAcctOpen} user={user} />
     </>
 }

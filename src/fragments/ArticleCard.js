@@ -7,8 +7,7 @@ import ArrowUpwardRoundedIcon from '@material-ui/icons/ArrowUpwardRounded';
 import ArrowDownwardRoundedIcon from '@material-ui/icons/ArrowDownwardRounded';
 import HelpOutlineRoundedIcon from '@material-ui/icons/HelpOutlineRounded';
 
-export default memo(function ArticleCard(p) {
-    const { imgURL, title, summary, rating } = p;
+export default memo(function ArticleCard({ imgURL, title, summary, rating, setArticle, body, hideVote, time, uid, setOpen }) {
     const isLoad =  !title || !summary || rating === null;
 
     return <Box pb={1.5}>
@@ -43,7 +42,11 @@ export default memo(function ArticleCard(p) {
                     </Tooltip>
                 </Box>
 
-                <CardActionArea>
+                <CardActionArea onClick={() => {
+                    if (isLoad) return;
+                    setArticle({imgURL, title, summary, rating, body, hideVote, time, uid});
+                    setOpen(true);
+                }}>
                     {
                         !isLoad && <>
                             <CardContent sx={{p: 1.25, pt: .75}}>
