@@ -157,6 +157,27 @@ export default function App() {
         }
     }, []);
 
+    // Load photos
+    useEffect(() => {
+        if (!user) return;
+        const t = [];
+        storageRef.child('userPostImages').listAll().then(res => {
+            console.log(res)
+            res.items.forEach(async r => {
+                const meta = await r.getMetadata();
+                const url = await r.getDownloadURL();
+
+                t.push({
+                    imgURL: url,
+                    title: meta.customMetadata.title,
+                    desc: meta.customMetadata.caption,
+                    likes: Math.floor(Math.random() * 20) - 10
+                });
+            });
+        });
+        setPhotoCardData(t);
+    }, [user])
+
     // Helper functions (in a function)
     const loadMoreArticles = useCallback(() => {
         let o = true;
@@ -175,26 +196,6 @@ export default function App() {
     useEffect(() => {
         loadMoreArticles();
     }, [loadMoreArticles]);
-
-    // Load photos
-    useEffect(() => {
-        const t = [];
-        storageRef.child('userPostImages').listAll().then(res => {
-            console.log(res)
-            res.items.forEach(async r => {
-                const meta = await r.getMetadata();
-                const url = await r.getDownloadURL();
-
-                t.push({
-                    imgURL: url,
-                    title: meta.customMetadata.title,
-                    desc: meta.customMetadata.caption,
-                    likes: Math.floor(Math.random() * 20) - 10
-                });
-            });
-        });
-        setPhotoCardData(t);
-    }, []);
 
     return <>
         <Collapse in={alertOpen} mountOnEnter unmountOnExit orientation='horizontal' style={{ position: 'fixed', zIndex: 6, ...alertStyles}}>

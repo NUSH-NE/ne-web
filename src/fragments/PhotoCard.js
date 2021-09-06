@@ -16,7 +16,7 @@ export default function PhotoCard({d, preview, previewOpen}) {
         previewOpen(true);
     }
 
-    return <Card sx={{minWidth: 320}}>
+    return <Card sx={{width: 320}}>
         <CardActionArea onClick={openPreview}>
             <CardMedia
                 sx={{ aspectRatio: '16/9', backgroundPosition: 'top'}}
@@ -24,9 +24,11 @@ export default function PhotoCard({d, preview, previewOpen}) {
                 title={d.title}
             />
             <CardContent>
-                <Typography gutterBottom variant='h6' component='div'>{d.title}</Typography>
+                <Typography gutterBottom variant='h6' component='div'
+                            sx={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{d.title}</Typography>
                 <Typography variant='body2' color='text.secondary' gutterBottom>by {d.user} ({d.likes} Likes)</Typography>
-                <Typography variant='body2' color='text.secondary'>{d.desc}</Typography>
+                <Typography variant='body2' color='text.secondary' sx={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>
+                    {d.desc}</Typography>
             </CardContent>
         </CardActionArea>
 

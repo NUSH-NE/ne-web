@@ -4,24 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="69b66c34-a61a-4161-b2d9-7207d31c2b09" name="Changes" comment="User sign in functionality, upload image button (that doesn't upload anything yet)">
-      <change afterPath="$PROJECT_DIR$/src/assets/cursors/zoom-in.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/cursors/zoom-out.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/ArticleViewer.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/PhotoPostViewer.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/SideDrawer.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/css/article.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/fragments/EndIsland.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/fragments/NewsCard.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/fragments/PhotoCard.js" afterDir="false" />
+    <list default="true" id="69b66c34-a61a-4161-b2d9-7207d31c2b09" name="Changes" comment="Basic image uploading, image post and article viewer, and side drawer with dummy news and events">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.yarn/install-state.gz" beforeDir="false" afterPath="$PROJECT_DIR$/.yarn/install-state.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Entry.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entry.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/fragments/ArticleCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/fragments/ArticleCard.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/fragments/UploadImgBtn.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/fragments/UploadImgBtn.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/assets/img/mainBg.webp" beforeDir="false" afterPath="$PROJECT_DIR$/src/assets/img/mainBg.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/fragments/PhotoCard.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/fragments/PhotoCard.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,14 +36,14 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/src/lib/themeOptions.js" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/components/UserAccount.js" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/public/404.html" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/fragments/SortButtonDropdown.js" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/App.js" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/fragments/ArticleCard.js" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/package.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/public/404.html" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Entry.js" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/fragments/SortButtonDropdown.js" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/App.js" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/components/UserAccount.js" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/lib/themeOptions.js" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="1uF2AV5ZVJFHPPMf9fnoAGIn4tN" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -173,7 +160,12 @@
       <workItem from="1627566332946" duration="4435000" />
       <workItem from="1627645627467" duration="5080000" />
       <workItem from="1627710410528" duration="15169000" />
-      <workItem from="1627781928481" duration="22478000" />
+      <workItem from="1627781928481" duration="22720000" />
+      <workItem from="1627827803575" duration="132000" />
+      <workItem from="1627976945369" duration="1354000" />
+      <workItem from="1628236022726" duration="933000" />
+      <workItem from="1628398042265" duration="5000" />
+      <workItem from="1630923578155" duration="3382000" />
     </task>
     <task id="LOCAL-00001" summary="Now fetches articles and links from Firestore!">
       <created>1624976782433</created>
@@ -189,7 +181,14 @@
       <option name="project" value="LOCAL" />
       <updated>1627571732809</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Basic image uploading, image post and article viewer, and side drawer with dummy news and events">
+      <created>1627826864974</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1627826864974</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -211,7 +210,8 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Now fetches articles and links from Firestore!" />
     <MESSAGE value="User sign in functionality, upload image button (that doesn't upload anything yet)" />
-    <option name="LAST_COMMIT_MESSAGE" value="User sign in functionality, upload image button (that doesn't upload anything yet)" />
+    <MESSAGE value="Basic image uploading, image post and article viewer, and side drawer with dummy news and events" />
+    <option name="LAST_COMMIT_MESSAGE" value="Basic image uploading, image post and article viewer, and side drawer with dummy news and events" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
