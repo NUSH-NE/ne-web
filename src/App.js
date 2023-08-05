@@ -263,8 +263,8 @@ export default function App() {
                                 startIcon={<DescriptionRoundedIcon />}>Latest news</Button>
                         {/*<Button size={btnSize} variant='contained' sx={{mx: .25}}*/}
                         {/*        startIcon={<GamesRoundedIcon />}>Games</Button>*/}
-                        <Button size={btnSize} variant='contained' sx={{ml: .25}} href='#sHash'
-                                startIcon={<PhotoRoundedIcon />}>Image posts</Button>
+                        {user && <Button size={btnSize} variant='contained' sx={{ml: .25}} href='#sHash'
+                                startIcon={<PhotoRoundedIcon />}>Image posts</Button>}
                     </Box>
                 </Box>
 
@@ -277,11 +277,12 @@ export default function App() {
                         </motion.span>
                     </IconButton>
                 }
-
-                <SortableSectionHeader header='Photos' mb={1} id='sHash'/>
+                {user && 
+                <SortableSectionHeader header='Photos' mb={1} id='sHash'/>}
                 {
                     !desktop && <Typography variant='subtitle2' color='text.secondary' mb={1}>Top 3 images posted this week</Typography>
                 }
+                {user && 
                 <Box display='flex' flexWrap='nowrap' gap={1} ref={pictureCarousel}
                      sx={{overflowX: 'auto', '&::-webkit-scrollbar': {height: 13},
                          '&:hover::-webkit-scrollbar-thumb': {backgroundColor: '#6B6B6BFF'},
@@ -291,14 +292,14 @@ export default function App() {
                         photoCardData.map(d => <PhotoCard d={d} key={d.name}
                                                           preview={setPrevPhoto} previewOpen={setPhotoPrevOpen} />)
                     }
-                </Box>
+                </Box>}
 
                 {
                     !desktop && <Button sx={{my: 1.8, width: '100%'}} variant='contained'
                                         startIcon={<PhotoRoundedIcon />}>View More</Button>
                 }
 
-                <Divider sx={{my: 1.8, mt: desktop ? 1.8 : 0}}/>
+                {user && <Divider sx={{my: 1.8, mt: desktop ? 1.8 : 0}}/>}
 
                 <SortableSectionHeader header='Articles' mb={1} />
                 {
@@ -361,7 +362,7 @@ export default function App() {
 
         <UserAccount open={acctOpen} setOpen={setAcctOpen} appName='NUSH NE'/>
 
-        <UploadImgBtn />
+        {user && <UploadImgBtn />}
 
         <ArticleViewer article={article} open={artOpen} setOpen={setArtOpen} />
 
