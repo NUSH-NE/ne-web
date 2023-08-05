@@ -354,7 +354,7 @@ export default function App() {
                 <Paper elevation={20} sx={{borderRadius: '36px 36px 0 0', p: '18px 18px 16px', m: '0 -18px'}}>
                     <Typography variant='h4'>NUSH NE Stuff</Typography>
                     <Typography variant='body1' color='text.secondary'>
-                        Another quality product by Vincent Kwok and Wang Zerui in collaboration with the NUSH NE community
+                        Another quality product by Vincent Kwok and Wang Zerui in collaboration with the NUSH NE committee
                     </Typography>
                 </Paper>
             </Paper>
