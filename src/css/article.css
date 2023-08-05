@@ -1,0 +1,92 @@
+/* Styles from TinyMCE */
+.artCont table {
+    border-collapse: collapse;
+    margin: .5rem 0;
+}
+
+.artCont table th,
+.artCont table td {
+    border: 1px solid #ccc;
+    padding: .4rem;
+}
+
+.artCont figure {
+    display: table;
+    margin: 1rem auto;
+}
+
+.artCont figure figcaption {
+    color: #999;
+    display: block;
+    margin-top: .25rem;
+    text-align: center;
+}
+
+.artCont hr {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 1px 0 0 0;
+}
+
+.artCont code {
+    background-color: #e8e8e8;
+    border-radius: 3px;
+    padding: .1rem .2rem;
+}
+
+.artCont > *:last-child { margin-bottom: 0; }
+.artCont > *:first-child { margin-top: 0; }
+
+.artCont p {
+    margin: 1rem 0;
+    opacity: .85;
+}
+
+.artCont h1, .artCont h2, .artCont h3, .artCont h4, .artCont h5, .artCont h6 {
+    font-weight: 600;
+    opacity: .85;
+    margin: 0 0 .35em;
+}
+
+.artCont h1 {
+    font-size: 2.375em;
+    line-height: 1.23;
+}
+.artCont h2 {
+    font-size: 1.875em;
+    line-height: 1.35;
+}
+.artCont h3 {
+    font-size: 1.5em;
+    line-height: 1.35;
+}
+.artCont h4 {
+    font-size: 1.25em;
+    line-height: 1.4;
+}
+.artCont h5 {
+    font-size: 1em;
+    line-height: 1.5;
+}
+.artCont h6 {
+    font-size: .75em;
+    line-height: 1.575;
+}
+
+.artCont a, .artCont.a:visited {
+    color: #1976d2;
+    text-decoration: none;
+}
+.artCont a:hover {
+    text-decoration: underline;
+}
+
+.artCont iframe {
+    max-width: 100%;
+}
+
+.artCont iframe, .artCont img {
+    border-radius: 7.0001px 7px 7px 7px; /* If the top left border radius isn't slightly different, it simply doesn't show */
+    box-shadow: 0px 7.333px 10.320px -4.666px rgba(0,0,0,0.2), 0px 16px 25.328px 2.000px rgba(0,0,0,0.14),
+    0px 6.000px 30.656px 5.333px rgba(0,0,0,0.12); /* 16dp elevation material shadow */
+}
