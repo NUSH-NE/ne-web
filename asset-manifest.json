@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/ne-web/static/css/main.0dc9a867.css",
-    "main.js": "/ne-web/static/js/main.ac0e4ec1.js",
+    "main.js": "/ne-web/static/js/main.267c8626.js",
     "static/js/377.9ff5c477.chunk.js": "/ne-web/static/js/377.9ff5c477.chunk.js",
     "static/media/mainBg.webp": "/ne-web/static/media/mainBg.028cebfa5748210a142a.webp",
     "static/media/noto-sans-all-400-normal.woff": "/ne-web/static/media/noto-sans-all-400-normal.afb599a90ed7f59170de.woff",
@@ -47,11 +47,11 @@
     "static/media/roboto-slab-greek-ext-700-normal.woff2": "/ne-web/static/media/roboto-slab-greek-ext-700-normal.9684ab380eb19d3fc8c8.woff2",
     "static/media/microsoft.svg": "/ne-web/static/media/microsoft.42b61fa109e1e5d566ff8226348f1657.svg",
     "main.0dc9a867.css.map": "/ne-web/static/css/main.0dc9a867.css.map",
-    "main.ac0e4ec1.js.map": "/ne-web/static/js/main.ac0e4ec1.js.map",
+    "main.267c8626.js.map": "/ne-web/static/js/main.267c8626.js.map",
     "377.9ff5c477.chunk.js.map": "/ne-web/static/js/377.9ff5c477.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.0dc9a867.css",
-    "static/js/main.ac0e4ec1.js"
+    "static/js/main.267c8626.js"
   ]
 }
